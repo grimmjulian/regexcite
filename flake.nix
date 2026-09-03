@@ -6,8 +6,14 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = nixpkgs.legacyPackages.${system};
         r-packages = with pkgs.rPackages; [
@@ -16,19 +22,61 @@
           roxygen2
           devtools
         ];
+
+        fmt-packages = with pkgs; [
+          air-formatter
+          nixfmt
+        ];
+
+        fmt-wrapper = pkgs.writeShellApplication {
+          name = "fmt";
+          runtimeInputs = fmt-packages;
+          text = ''
+            air format "''${@:-.}"
+            nixfmt flake.nix
+          '';
+        };
+
       in
       {
         devShells.default = pkgs.mkShell {
-          buildInputs = [
-          (pkgs.rWrapper.override {
-            packages = r-packages;
-          })
-          ];
+          buildInputs =
+            with pkgs;
+            [
+              (rWrapper.override {
+                packages = r-packages;
+              })
+              nil
+            ]
+            ++ fmt-packages;
           shellHook = ''
             echo "regexcite development environment loaded"
             echo "R version: $(R --version | head -1)"
           '';
         };
+
+        checks = {
+          r-cmd-check = pkgs.rPackages.buildRPackage {
+            pname = "regexcite";
+            version = "0.0.1";
+            src = ./.;
+            propagatedBuildInputs = r-packages;
+
+            doCheck = true;
+
+            checkPhase = ''
+              runHook preCheck
+              export _R_CHECK_CRAN_INCOMING_=false
+              export _R_CHECK_CRAN_INCOMING_REMOTE_=false
+              export _R_CHECK_FORCE_SUGGESTS_=false
+              R CMD build .
+              R CMD check regexcite_*.tar.gz --no-manual --as-cran
+              runHook postCheck
+            '';
+          };
+        };
+
+        formatter = fmt-wrapper;
       }
     );
 }
