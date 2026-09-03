@@ -14,6 +14,7 @@
           stringr
           testthat
           roxygen2
+          devtools
         ];
       in
       {

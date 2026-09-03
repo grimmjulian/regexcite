@@ -11,24 +11,25 @@ str_split_one(string, pattern, n = Inf)
 
 \item{pattern}{Pattern to look for.
 
-The default interpretation is a regular expression, as described
-in \link[stringi:about_search_regex]{stringi::stringi-search-regex}. Control options with
-\code{\link[stringr:modifiers]{regex()}}.
+The default interpretation is a regular expression, as described in
+\code{vignette("regular-expressions")}. Use \code{\link[stringr:regex]{regex()}} for finer control of the
+matching behaviour.
 
 Match a fixed string (i.e. by comparing only bytes), using
-\code{\link[stringr:modifiers]{fixed()}}. This is fast, but approximate. Generally,
-for matching human text, you'll want \code{\link[stringr:modifiers]{coll()}} which
+\code{\link[stringr:fixed]{fixed()}}. This is fast, but approximate. Generally,
+for matching human text, you'll want \code{\link[stringr:coll]{coll()}} which
 respects character matching rules for the specified locale.
 
 Match character, word, line and sentence boundaries with
-\code{\link[stringr:modifiers]{boundary()}}. An empty pattern, "", is equivalent to
-\code{boundary("character")}.}
+\code{\link[stringr:boundary]{boundary()}}. The empty string, \verb{""``, is equivalent to }boundary("character")`.}
 
-\item{n}{number of pieces to return.  Default (Inf) uses all
+\item{n}{Maximum number of pieces to return. Default (Inf) uses all
 possible split positions.
 
-For \code{str_split_fixed}, if n is greater than the number of pieces,
-the result will be padded with empty strings.}
+For \code{str_split()}, this determines the maximum length of each element
+of the output. For \code{str_split_fixed()}, this determines the number of
+columns in the output; if an input is too short, the result will be padded
+with \code{""}.}
 }
 \value{
 A character vector.
