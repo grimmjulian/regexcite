@@ -60,6 +60,24 @@
         };
 
         checks = {
+          format =
+            pkgs.runCommand "check-format"
+              {
+                nativeBuildInputs = fmt-packages;
+                src = ./.;
+              }
+              ''
+                cd "$src"
+
+                echo "Checking R formatting with air..."
+                air format --check .
+
+                echo "Checking Nix formatting with nixfmt..."
+                nixfmt --check flake.nix
+
+                touch $out
+              '';
+
           r-cmd-check = pkgs.rPackages.buildRPackage {
             pname = "regexcite";
             version = pkgVersion;
