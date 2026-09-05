@@ -41,8 +41,20 @@
         versionMatch = builtins.match ".*Version:[[:space:]]*([0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?).*" desc;
         pkgVersion = if versionMatch != null then builtins.head versionMatch else "0.0.0";
 
+        regexcitePkg = pkgs.rPackages.buildRPackage {
+          pname = "regexcite";
+          version = pkgVersion;
+          src = ./.;
+          propagatedBuildInputs = r-packages;
+        };
+
       in
       {
+        packages = {
+          default = regexcitePkg;
+          regexcite = regexcitePkg;
+        };
+
         devShells.default = pkgs.mkShell {
           buildInputs =
             with pkgs;
@@ -78,14 +90,8 @@
                 touch $out
               '';
 
-          r-cmd-check = pkgs.rPackages.buildRPackage {
-            pname = "regexcite";
-            version = pkgVersion;
-            src = ./.;
-            propagatedBuildInputs = r-packages;
-
+          r-cmd-check = regexcitePkg.overrideAttrs (oldAttrs: {
             doCheck = true;
-
             checkPhase = ''
               runHook preCheck
               export _R_CHECK_CRAN_INCOMING_=false
@@ -95,7 +101,7 @@
               R CMD check regexcite_*.tar.gz --no-manual --as-cran
               runHook postCheck
             '';
-          };
+          });
         };
 
         formatter = fmt-wrapper;
