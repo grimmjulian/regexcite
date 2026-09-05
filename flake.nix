@@ -19,8 +19,11 @@
         r-packages = with pkgs.rPackages; [
           stringr
           testthat
-          roxygen2
+        ];
+
+        dev-r-packages = with pkgs.rPackages; [
           devtools
+          roxygen2
         ];
 
         fmt-packages = with pkgs; [
@@ -61,7 +64,7 @@
             with pkgs;
             [
               (rWrapper.override {
-                packages = r-packages;
+                packages = r-packages ++ dev-r-packages;
               })
               nil
             ]
