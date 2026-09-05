@@ -25,6 +25,7 @@
 
         fmt-packages = with pkgs; [
           air-formatter
+          jarl
           nixfmt
         ];
 
@@ -80,13 +81,20 @@
               }
               ''
                 cd "$src"
-
-                echo "Checking R formatting with air..."
                 air format --check .
-
-                echo "Checking Nix formatting with nixfmt..."
                 nixfmt --check flake.nix
+                touch $out
+              '';
 
+          lint =
+            pkgs.runCommand "check-lint"
+              {
+                nativeBuildInputs = [ pkgs.jarl ];
+                src = ./.;
+              }
+              ''
+                cd "$src"
+                jarl check .
                 touch $out
               '';
 
