@@ -37,6 +37,10 @@
           '';
         };
 
+        desc = builtins.readFile ./DESCRIPTION;
+        versionMatch = builtins.match ".*Version:[[:space:]]*([0-9]+\\.[0-9]+\\.[0-9]+(\\.[0-9]+)?).*" desc;
+        pkgVersion = if versionMatch != null then builtins.head versionMatch else "0.0.0";
+
       in
       {
         devShells.default = pkgs.mkShell {
@@ -58,7 +62,7 @@
         checks = {
           r-cmd-check = pkgs.rPackages.buildRPackage {
             pname = "regexcite";
-            version = "0.0.1";
+            version = pkgVersion;
             src = ./.;
             propagatedBuildInputs = r-packages;
 

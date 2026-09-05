@@ -1,6 +1,6 @@
 Package: regexcite
 Title: Make Regular Expressions More Exciting
-Version: 1.0.0
+Version: 1.0.0.9000
 Authors@R: 
     person("Jane", "Doe", , "jane@example.com", role = c("aut", "cre"))
 Description: Convenience functions to make some common tasks with string
